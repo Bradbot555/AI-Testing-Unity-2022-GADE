@@ -1,0 +1,56 @@
+using System;
+using System.Xml.Serialization;
+using System.IO;
+
+namespace NN
+{
+    public static class Utils
+    {
+        /// <summary>
+        /// Writes the given object instance to a binary file.
+        /// <para>Object type (and all child types) must be decorated with the [Serializable] attribute.</para>
+        /// <para>To prevent a variable from being serialized, decorate it with the [NonSerialized] attribute; cannot be applied to properties.</para>
+        /// </summary>
+        /// <typeparam name="T">The type of object being written to the binary file.</typeparam>
+        /// <param name="filePath">The file path to write the object instance to.</param>
+        /// <param name="objectToWrite">The object instance to write to the binary file.</param>
+        /// <param name="append">If false the file will be overwritten if it already exists. If true the contents will be appended to the file.</param>
+        public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
+        {
+            using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, objectToWrite);
+            }
+        }
+
+        public static T ReadFromBinaryFile<T>(string filePath)
+        {
+            using (Stream stream = File.Open(filePath, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return (T)binaryFormatter.Deserialize(stream);
+            }
+        }
+
+        public static Random random = new Random();
+        public static double RandomRange(double min, double max)
+        {
+            return random.NextDouble() * (max - min) + min;
+        }
+    }
+
+    //H, Scheepers. 2021. Utils class 
+
+
+    public struct ExperianceEntry
+    {
+        public double[] prevState;//game state before an action has been made
+
+        public Move actionRef;// the chosen action/ random or calculated by the AI
+
+        public float reward;//the reward of applying the above action
+
+        public int[,] MultiDGameState;//what the game state is after the application of the above action
+    }
+}
